@@ -1,0 +1,2 @@
+nodeA slots=2
+nodeB slots=2                                        # specify cores per node :contentReference[oaicite:10]{index=10}

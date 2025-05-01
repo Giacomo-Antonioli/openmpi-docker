@@ -1,0 +1,2 @@
+mpi_head slots=2
+mpi_worker slots=2

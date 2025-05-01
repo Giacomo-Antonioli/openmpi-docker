@@ -1,12 +1,41 @@
 version: "3.9"
+
 services:
   mpi_head:
-    image: awoo/dockermpi
+    image: test/testc
+    hostname: head       # Assign a hostname to the head node too
     ports:
       - "6699:22"
-    links:
-      - "mpi_node:nodes"
-  mpi_node:
-    image: awoo/dockermpi
-    deploy:
-      replicas: 4
+    networks:
+      - mpi_net
+    dns_search: [.]
+    # 'links' is deprecated; use networks instead.
+    # The head node can now reach nodes by names 'node1', 'node2', etc.
+
+  mpi_node_1:             # Define node 1 explicitly
+    image: test/testc
+    hostname: node1       # Custom hostname for node 1
+    networks:
+      - mpi_net
+
+  mpi_node_2:             # Define node 2 explicitly
+    image: test/testc
+    hostname: node2       # Custom hostname for node 2
+    networks:
+      - mpi_net
+
+  mpi_node_3:             # Define node 3 explicitly
+    image: test/testc
+    hostname: node3       # Custom hostname for node 3
+    networks:
+      - mpi_net
+
+  mpi_node_4:             # Define node 4 explicitly
+    image: test/testc
+    hostname: node4       # Custom hostname for node 4
+    networks:
+      - mpi_net
+
+networks:
+  mpi_net:              # Define the custom network
+    driver: bridge

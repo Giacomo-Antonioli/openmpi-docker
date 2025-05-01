@@ -1,7 +1,7 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
-ENV USER awoo
-ENV MPI_SOURCE_CODE mpi_program.c
+ENV USER giaco
+ENV MPI_SOURCE_CODE test_nodes.cpp
 
 ENV DEBIAN_FRONTEND=noninteractive \
     HOME=/home/${USER}
@@ -12,8 +12,26 @@ RUN apt-get update -y && \
     gcc gfortran libopenmpi-dev openmpi-bin openmpi-common openmpi-doc binutils dnsutils && \
     apt-get clean && apt-get purge && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp*
 
+
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends \
+        sudo \
+        apt-utils \
+        openssh-server \
+        gcc \
+        g++ \
+        gfortran \
+        libopenmpi-dev \
+        openmpi-bin \
+        openmpi-common \
+        openmpi-doc \
+        binutils \
+        dnsutils && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 RUN mkdir /var/run/sshd
-RUN echo 'root:${USER}' | chpasswd
+RUN echo 'root:giaco' | chpasswd
 RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 
@@ -42,7 +60,9 @@ ADD ./fetch_hostnames.sh ${HOME}/fetch_hostnames.sh
 # Add your files here
 ADD ./mpi_hello_world.c ${HOME}/${MPI_SOURCE_CODE}
 # Compile the program
-RUN mpicc ${HOME}/${MPI_SOURCE_CODE} -o ${HOME}/mpiprogram
+ADD ./other/ ${HOME}
+#RUN mpicc ${HOME}/${MPI_SOURCE_CODE} -o ${HOME}/mpiprogram
+RUN mpic++ ${HOME}/test_nodes.cpp -o ${HOME}/DOCKERTEST
 
 EXPOSE 22
 CMD [ "/usr/sbin/sshd", "-D" ]
